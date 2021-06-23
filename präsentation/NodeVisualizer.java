@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 
@@ -12,18 +13,24 @@ final public class NodeVisualizer implements ActionListener{
     JFrame frame;
     JButton button1;
     JButton button2;
+    JPanel top;
     präsentation.NodeVisualizer.DrawPanel drawPanel;
     Tree tree;
     boolean flag = false;
+    boolean nextPls = false;
+    int i = 0;
 
     Color slightBlack = new Color(0, 0, 0,  200);
 
 
     public void go(Tree tree) {
         frame = new JFrame("NodeVisualizer");
-        button1 = new JButton("refresh");
-        button2 = new JButton("start");
+        button1 = new JButton("remesh");
+        button2 = new JButton("next");
         drawPanel = new präsentation.NodeVisualizer.DrawPanel();
+        top = new JPanel();
+        top.add(button1);
+        top.add(button2);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(2560,1440);
@@ -38,8 +45,7 @@ final public class NodeVisualizer implements ActionListener{
         button2.setBackground(Color.WHITE);
         button2.addActionListener(this);
 
-        frame.getContentPane().add(BorderLayout.NORTH, button1);
-        frame.getContentPane().add(BorderLayout.NORTH, button2);
+        frame.getContentPane().add(BorderLayout.NORTH, top);
         frame.getContentPane().add(BorderLayout.CENTER, drawPanel);
 
 
@@ -182,12 +188,24 @@ final public class NodeVisualizer implements ActionListener{
         frame.repaint();
     }
 
+    public void waitTillNext() throws InterruptedException {
+        i = 0;
+        while (i<999999999 && (!nextPls)){
+            i++;
+            TimeUnit.MILLISECONDS.sleep(1);
+        }
+
+        System.out.println(i +" "+ nextPls);
+        nextPls = false;
+    }
+
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == button1){
             refresh();
         }
         if(e.getSource() == button2){
-            refresh();
+            nextPls = true;
+            System.out.println(nextPls);
         }
     }
 }

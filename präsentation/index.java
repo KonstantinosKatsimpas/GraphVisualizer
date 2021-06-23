@@ -32,7 +32,10 @@ public class index {
         while (true) {
             tree.reset();
             tree.tiefenSuche();
+            tree.reset();
+            tree.breitenSuche();
         }
+
 
     }
 }

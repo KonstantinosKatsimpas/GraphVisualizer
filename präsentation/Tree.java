@@ -1,15 +1,12 @@
 package präsentation;
 
-import SortierAlgorithmen.Visualizer;
-
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Tree {
     ArrayList<Node> nodes = new ArrayList<Node>();
     ArrayList<Node> besucht = new ArrayList<Node>();
-    ArrayList<Node> offenQueue = new ArrayList<Node>();
-    ArrayList<Node> offenStack = new ArrayList<Node>();
+    ArrayList<Node> offen = new ArrayList<Node>();
     Node jetzt;
     Node zielNode;
     int speed = 0;
@@ -36,11 +33,56 @@ public class Tree {
         nodes.add(new Node(data));
     }
 
-    public void breitenSuche() {
+    public void tiefenSuche() throws InterruptedException {
+        boolean gefunden = false;
+        boolean schonBesucht = false;
+        jetzt = nodes.get(start);
+        jetzt.jetzt = true;
+        zielNode = nodes.get(ziel);
+        zielNode.ziel = true;
+        refresh();
+        TimeUnit.SECONDS.sleep(2);
+        while (!gefunden) {
+            for (int i=0; i<jetzt.nodes.size(); i++) {
+                schonBesucht = false;
+                for (int k=0; k<besucht.size(); k++) {
+                    if (jetzt.nodes.get(i).equals(besucht.get(k))) {
+                        schonBesucht = true;
+                        break;
+                    }
+                }
+                if (!schonBesucht) {
+                    offen.add(jetzt.nodes.get(i));
+                    jetzt.nodes.get(i).offen = true;
+                    refresh();
+                }
+            }
 
+            System.out.println(jetzt.data);
+            besucht.add(jetzt);
+            jetzt.jetzt = false;
+            jetzt.besucht = true;
+            jetzt = offen.get(offen.size()-1);
+            jetzt.jetzt = true;
+            jetzt.offen = false;
+            refresh();
+            offen.remove(offen.size()-1);
+
+            if (jetzt.equals(zielNode)) {
+                System.out.println("gefunden");
+                gefunden = true;
+            }
+
+
+        }
+        jetzt.jetzt = false;
+        jetzt.ziel = false;
+        jetzt.gefunden = true;
+        refresh();
+        TimeUnit.SECONDS.sleep(2);
     }
 
-    public void tiefenSuche() throws InterruptedException {
+    public void breitenSuche() throws InterruptedException {
         boolean gefunden = false;
         boolean schonBesucht = false;
         jetzt = nodes.get(start);
@@ -60,7 +102,7 @@ public class Tree {
                     }
                 }
                 if (!schonBesucht) {
-                    offenStack.add(jetzt.nodes.get(i));
+                    offen.add(jetzt.nodes.get(i));
                     jetzt.nodes.get(i).offen = true;
                     refresh();
                 }
@@ -70,11 +112,11 @@ public class Tree {
             besucht.add(jetzt);
             jetzt.jetzt = false;
             jetzt.besucht = true;
-            jetzt = offenStack.get(offenStack.size()-1);
+            jetzt = offen.get(0);
             jetzt.jetzt = true;
             jetzt.offen = false;
             refresh();
-            offenStack.remove(offenStack.size()-1);
+            offen.remove(0);
 
             if (jetzt.equals(zielNode)) {
                 System.out.println("gefunden");
@@ -97,7 +139,7 @@ public class Tree {
             nodes.get(i).gefunden = false;
         }
         besucht.clear();
-        offenStack.clear();
+        offen.clear();
         refresh();
     }
 
@@ -106,6 +148,7 @@ public class Tree {
     }
 
     public void refresh() throws InterruptedException {
+        //v.waitTillNext();
         v.refresh(this);
         TimeUnit.MILLISECONDS.sleep(speed);
     }
